@@ -14,8 +14,11 @@ class RecetasApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'App Móvil: Recetas del Mayab',
+      title: 'Recetas App',
       debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        primarySwatch: Colors.pink,
+      ),
       initialRoute: '/',
       routes: {
         '/': (context) => const SplashScreen(),

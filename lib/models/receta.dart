@@ -27,23 +27,23 @@ class Receta {
 
     return Receta(
       id: (json['id'] as num?)?.toInt() ?? 0,
-      nombre: (json['name'] as String?) ?? 'Sin nombre',
+      nombre: json['name'] is String ? json['name'] as String : 'Sin nombre',
       ingredientes: ingredientes is List
-          ? ingredientes.map((e) => e.toString()).toList()
+          ? ingredientes.map((item) => item.toString()).toList()
           : const [],
       instrucciones: instrucciones is List
-          ? instrucciones.map((e) => e.toString()).toList()
+          ? instrucciones.map((item) => item.toString()).toList()
           : const [],
       tiempoPreparacion: (json['prepTimeMinutes'] as num?)?.toInt() ?? 0,
       tiempoCoccion: (json['cookTimeMinutes'] as num?)?.toInt() ??
           (json['cookingMinutes'] as num?)?.toInt() ??
           0,
       calorias: (json['caloriesPerServing'] as num?)?.toInt() ?? 0,
-      imagenUrl: (json['imageUrl'] as String?) ??
-          (json['image'] as String?) ??
-          '',
-      calificacion: ((json['rating'] ?? json['calificacion']) as num?)?.toDouble() ??
-          0.0,
+      imagenUrl: json['image'] is String
+          ? json['image'] as String
+          : (json['imageUrl'] as String?) ?? '',
+      calificacion:
+          ((json['rating'] ?? json['calificacion']) as num?)?.toDouble() ?? 0,
     );
   }
 
