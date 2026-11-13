@@ -3,8 +3,11 @@ import 'package:recetas_app/models/receta.dart';
 import 'package:recetas_app/screens/detalle_receta_screen.dart';
 import 'package:recetas_app/screens/home_screen.dart';
 import 'package:recetas_app/screens/splash_screen.dart';
+import 'package:recetas_app/services/sqlite_database_factory.dart';
 
-void main() {
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initializeSqliteDatabaseFactory();
   runApp(const RecetasApp());
 }
 
@@ -16,9 +19,7 @@ class RecetasApp extends StatelessWidget {
     return MaterialApp(
       title: 'Recetas App',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.pink,
-      ),
+      theme: ThemeData(primarySwatch: Colors.pink),
       initialRoute: '/',
       routes: {
         '/': (context) => const SplashScreen(),

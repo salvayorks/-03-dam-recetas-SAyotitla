@@ -1,13 +1,26 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:path/path.dart';
 import 'package:recetas_app/main.dart';
 import 'package:recetas_app/models/receta.dart';
 import 'package:recetas_app/models/resena.dart';
 import 'package:recetas_app/screens/detalle_receta_screen.dart';
 import 'package:recetas_app/services/resena_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite/sqflite.dart' as sqflite;
+import 'package:sqflite_common_ffi/sqflite_ffi.dart' as ffi;
 
 void main() {
+  setUpAll(() async {
+    ffi.sqfliteFfiInit();
+    sqflite.databaseFactory = ffi.databaseFactoryFfiNoIsolate;
+    await sqflite.deleteDatabase(
+      join(await sqflite.getDatabasesPath(), 'recetas_app.db'),
+    );
+  });
+
   testWidgets('shows the splash screen when the app starts', (tester) async {
     await tester.pumpWidget(const RecetasApp());
 
@@ -32,6 +45,25 @@ void main() {
     expect(receta.totalTime, 30);
     expect(receta.calificacion, 4.5);
     expect(receta.imagenUrl, 'https://example.com/receta.jpg');
+  });
+
+  test('migrates existing reviews from shared preferences to SQLite', () async {
+    final resena = {
+      'autor': 'Ana',
+      'comentario': 'Muy rica',
+      'calificacion': 4,
+      'fecha': DateTime(2026, 11, 13).toIso8601String(),
+    };
+    SharedPreferences.setMockInitialValues({
+      'resenas_receta_7': jsonEncode([resena]),
+    });
+
+    final resenas = await ResenaService().obtenerResenas(7);
+
+    expect(resenas, hasLength(1));
+    expect(resenas.single.autor, 'Ana');
+    final preferences = await SharedPreferences.getInstance();
+    expect(preferences.getString('resenas_receta_7'), isNull);
   });
 
   test('saves reviews separately for each recipe', () async {
